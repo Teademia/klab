@@ -14,7 +14,10 @@
 #![feature(alloc_error_handler)]
 
 extern crate alloc;
+#[macro_use]
 extern crate bitflags;
+#[macro_use]
+extern crate log;
 
 use core::arch::global_asm;
 use log::*;
