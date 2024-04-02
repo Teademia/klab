@@ -1,0 +1,1 @@
+/home/hp/project/rCore-Tutorial-v3/user/target/riscv64gc-unknown-none-elf/release/00hello_world: /home/hp/project/rCore-Tutorial-v3/user/src/bin/00hello_world.rs /home/hp/project/rCore-Tutorial-v3/user/src/console.rs /home/hp/project/rCore-Tutorial-v3/user/src/lang_items.rs /home/hp/project/rCore-Tutorial-v3/user/src/lib.rs /home/hp/project/rCore-Tutorial-v3/user/src/syscall.rs
