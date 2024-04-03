@@ -1,6 +1,5 @@
-use buddy_system_allocator::LockedHeap;
 use crate::config::KERNEL_HEAP_SIZE;
-use log::*;
+use buddy_system_allocator::LockedHeap;
 #[global_allocator]
 /// heap allocator instance
 static HEAP_ALLOCATOR: LockedHeap = LockedHeap::empty();
@@ -13,7 +12,6 @@ pub fn handle_alloc_error(layout: core::alloc::Layout) -> ! {
 
 /// heap space ([u8; KERNEL_HEAP_SIZE])
 static mut HEAP_SPACE: [u8; KERNEL_HEAP_SIZE] = [0; KERNEL_HEAP_SIZE];
-
 
 /// initiate heap allocator
 pub fn init_heap() {
@@ -46,5 +44,5 @@ pub fn heap_test() {
     }
     assert!(bss_range.contains(&(v.as_ptr() as usize)));
     drop(v);
-    debug!("heap test passed");
+    //debug!("heap test passed");
 }
