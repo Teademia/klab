@@ -1,0 +1,5 @@
+cargo:rerun-if-changed=../user/src/
+cargo:rerun-if-changed=../user/target/riscv64gc-unknown-none-elf/release/
+app_0: 00test1
+app_1: 00test2
+app_2: 00test3

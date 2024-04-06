@@ -62,7 +62,6 @@ impl MemorySet {
     fn push(&mut self, mut map_area: MapArea, data: Option<&[u8]>) {
         map_area.map(&mut self.page_table);
         if let Some(data) = data {
-            println!("Finding data {}", data.len());
             map_area.copy_data(&mut self.page_table, data);
         }
         self.areas.push(map_area);
@@ -300,7 +299,6 @@ impl MapArea {
                 .unwrap()
                 .ppn()
                 .get_bytes_array()[..src.len()];
-            println!("The length of dst is {}", dst.len());
             dst.copy_from_slice(src);
             start += PAGE_SIZE;
             if start >= len {

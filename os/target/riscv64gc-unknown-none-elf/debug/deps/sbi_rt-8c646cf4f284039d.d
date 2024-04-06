@@ -1,0 +1,14 @@
+/home/hp/project/klab/os/target/riscv64gc-unknown-none-elf/debug/deps/libsbi_rt-8c646cf4f284039d.rmeta: /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/lib.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/binary.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/base.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/legacy.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/time.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/spi.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/rfnc.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/hsm.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/srst.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/pmu.rs
+
+/home/hp/project/klab/os/target/riscv64gc-unknown-none-elf/debug/deps/sbi_rt-8c646cf4f284039d.d: /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/lib.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/binary.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/base.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/legacy.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/time.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/spi.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/rfnc.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/hsm.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/srst.rs /home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/pmu.rs
+
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/lib.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/binary.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/base.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/legacy.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/time.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/spi.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/rfnc.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/hsm.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/srst.rs:
+/home/hp/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sbi-rt-0.0.2/src/pmu.rs:

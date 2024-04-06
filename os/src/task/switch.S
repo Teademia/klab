@@ -30,5 +30,8 @@ __switch:
     .endr
     # restore kernel stack of next task
     ld sp, 8(a1)
+    //ret是跳转到寄存器ra
+    //第一次ra被至为return_trap函数的所在地
+    //之后则是
     ret
 
