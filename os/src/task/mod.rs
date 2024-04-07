@@ -27,15 +27,15 @@ struct TaskManagerInner {
 
 lazy_static! {
     pub static ref TASK_MANAGER: TaskManager = {
-        debug!("init TASK_MANAGER");
+        info!("init TASK_MANAGER");
         let num_app = get_num_app();
-        debug!("num_app = {}", num_app);
+        info!("Finding {} apps", num_app);
         let mut tasks: Vec<TaskControlBlock> = Vec::new();
         for i in 0..num_app {
             let a = get_app_data(i);
             tasks.push(TaskControlBlock::new(get_app_data(i), i));
         }
-        warn!("Finish Initialize TASK_MANAGER");
+        info!("Finish Initialize TASK_MANAGER");
         TaskManager {
             num_app,
             inner: unsafe {
@@ -49,6 +49,11 @@ lazy_static! {
 }
 
 impl TaskManager {
+    fn mark_current_suspended(&self) {
+        let mut inner = self.inner.exclusive_access();
+        let cur = inner.current_task;
+        inner.tasks[cur].task_status = TaskStatus::Ready;
+    }
     fn mark_current_exited(&self) {
         let mut inner = self.inner.exclusive_access();
         let cur = inner.current_task;
@@ -67,7 +72,7 @@ impl TaskManager {
             unsafe { __switch(current_task_cx_ptr, next_task_cx_ptr) }
         } else {
             info!("All applications completed!");
-            shutdown(true);
+            shutdown(false);
         }
     }
     fn find_next_task(&self) -> Option<usize> {
@@ -119,6 +124,17 @@ pub fn run_first_task() {
     TASK_MANAGER.run_first_task();
 }
 
+pub fn exit_current_and_run_next() {
+    mark_current_exited();
+    run_next_task();
+}
+
+/// Suspend the current 'Running' task and run the next task in task list.
+pub fn suspend_current_and_run_next() {
+    mark_current_suspended();
+    run_next_task();
+}
+
 pub fn current_trap_cx() -> &'static mut TrapContext {
     TASK_MANAGER.get_current_trap_cx()
 }
@@ -131,7 +147,10 @@ pub fn show_task_status() {
     TASK_MANAGER.show_task_status();
 }
 
-pub fn exit_current_and_run_next() {
+pub fn mark_current_exited() {
     TASK_MANAGER.mark_current_exited();
-    TASK_MANAGER.run_next_task();
+}
+
+pub fn mark_current_suspended() {
+    TASK_MANAGER.mark_current_suspended();
 }

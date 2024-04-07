@@ -75,8 +75,7 @@ pub fn trap_from_kernel() -> ! {
 }
 
 pub fn init() {
-    debug!("Set Kernel TrapHandler");
-    set_kernel_trap_entry();
+    set_kernel_trap_entry(); //Set Kernel Trap Entry to panic
 }
 
 fn set_user_trap_entry() {

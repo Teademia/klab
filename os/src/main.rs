@@ -48,3 +48,12 @@ pub fn rust_main() -> ! {
     //task::run_first_task();
     sbi::shutdown(false)
 }
+
+/*程序的结构设计如下
+    1.main
+    2.task_run_first_task
+    3._switch
+    4._restore
+    5.apps
+    6.run_next_app    All apps completed
+*/
