@@ -4,7 +4,8 @@ pub use context::TrapContext;
 use crate::config::{TRAMPOLINE, TRAP_CONTEXT};
 use crate::sbi;
 use crate::syscall::syscall;
-use crate::task::{current_trap_cx, current_user_token};
+use crate::task::{current_trap_cx, current_user_token, suspend_current_and_run_next};
+use crate::timer::set_next_trigger;
 use core::arch::{asm, global_asm};
 use riscv::register::{
     mtvec::TrapMode,
@@ -58,6 +59,11 @@ pub fn trap_handler() {
             cx.sepc += 4;
             cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
         }
+        Trap::Interrupt(Interrupt::SupervisorTimer) => {
+            set_next_trigger();
+            info!("Get time intterupt");
+            suspend_current_and_run_next();
+        }
         _ => {
             panic!(
                 "Unsupported trap {:?}, stval = {:#x}!",
@@ -86,5 +92,11 @@ fn set_user_trap_entry() {
 fn set_kernel_trap_entry() {
     unsafe {
         stvec::write(trap_from_kernel as usize, TrapMode::Direct);
+    }
+}
+
+pub fn enable_timer_interrupt() {
+    unsafe {
+        sie::set_stimer();
     }
 }

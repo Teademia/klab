@@ -26,12 +26,12 @@ pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
     match syscall_id {
         SYSCALL_WRITE => sys_write(args[0], args[1] as *const u8, args[2]),
         SYSCALL_EXIT => {
-            info!("Going to run next");
+            //info!("Going to run next");
             task::exit_current_and_run_next();
             0
         }
         SYSCALL_YIELD => {
-            task::show_task_status();
+            //task::show_task_status();
             task::suspend_current_and_run_next();
             0
         }

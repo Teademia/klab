@@ -32,6 +32,7 @@ mod sbi;
 mod sync;
 mod syscall;
 mod task;
+mod timer;
 mod trap;
 
 global_asm!(include_str!("entry.asm"));
@@ -44,8 +45,9 @@ pub fn rust_main() -> ! {
     logging::init();
     mm::init();
     trap::init();
+    trap::enable_timer_interrupt();
+    timer::set_next_trigger();
     task::run_first_task();
-    //task::run_first_task();
     sbi::shutdown(false)
 }
 

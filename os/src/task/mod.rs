@@ -27,7 +27,7 @@ struct TaskManagerInner {
 
 lazy_static! {
     pub static ref TASK_MANAGER: TaskManager = {
-        info!("init TASK_MANAGER");
+        //info!("init TASK_MANAGER");
         let num_app = get_num_app();
         info!("Finding {} apps", num_app);
         let mut tasks: Vec<TaskControlBlock> = Vec::new();
@@ -35,7 +35,6 @@ lazy_static! {
             let a = get_app_data(i);
             tasks.push(TaskControlBlock::new(get_app_data(i), i));
         }
-        info!("Finish Initialize TASK_MANAGER");
         TaskManager {
             num_app,
             inner: unsafe {
@@ -120,7 +119,7 @@ pub fn current_user_token() -> usize {
 }
 
 pub fn run_first_task() {
-    debug!("Ready To Go first Task");
+    info!("Ready To Go first Task");
     TASK_MANAGER.run_first_task();
 }
 

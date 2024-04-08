@@ -18,6 +18,7 @@ pub fn get_app_data(app_id: usize) -> &'static [u8] {
     let app_start = unsafe { core::slice::from_raw_parts(num_app_ptr.add(1), num_app + 1) };
     assert!(app_id < num_app);
     unsafe {
+        info!("Finding app {} at PhysAddr {:x}", app_id, app_start[app_id]);
         core::slice::from_raw_parts(
             app_start[app_id] as *const u8,
             app_start[app_id + 1] - app_start[app_id],
