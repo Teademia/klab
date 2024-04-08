@@ -210,9 +210,11 @@ where
         assert!(start <= end, "start {:?} > end {:?}!", start, end);
         Self { l: start, r: end }
     }
+    #[allow(unused)]
     pub fn get_start(&self) -> T {
         self.l
     }
+    #[allow(unused)]
     pub fn get_end(&self) -> T {
         self.r
     }

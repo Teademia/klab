@@ -1,4 +1,6 @@
 #![allow(unused)]
+use crate::config::*;
+use crate::timer::*;
 
 /// use sbi call to putchar in console (qemu uart handler)
 pub fn console_putchar(c: usize) {
@@ -21,4 +23,9 @@ pub fn shutdown(failure: bool) -> ! {
         system_reset(Shutdown, SystemFailure);
     }
     unreachable!()
+}
+
+//这个函数是用来设置mtimecmp寄存器的值
+pub fn set_timer(timer: usize) {
+    sbi_rt::set_timer(timer as _);
 }
