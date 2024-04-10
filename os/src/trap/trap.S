@@ -55,10 +55,7 @@ __restore:
     ld t0, 32*8(sp)
     ld t1, 33*8(sp)
     csrw sstatus, t0
-    //sepc寄存器是sret用来记录返回地址的
-    //第一次执行任务时，t1内保存的是Trap_Context的地址，TrapContext的第33个是spec,前面已经用t1 33*8(sp)加载到t1了,
-    //TrapContext结体的初始化在TaskControlBLock::new中调用了TrapContext::app_init_context
-    csrw sepc, t1      
+    csrw sepc, t1
     # restore general purpose registers except x0/sp/tp
     ld x1, 1*8(sp)
     ld x3, 3*8(sp)

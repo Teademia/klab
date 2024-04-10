@@ -1,5 +1,4 @@
 //! The panic handler
-
 use crate::sbi::shutdown;
 use core::panic::PanicInfo;
 use log::*;
@@ -17,15 +16,4 @@ fn panic(info: &PanicInfo) -> ! {
         error!("[kernel] Panicked: {}", info.message().unwrap());
     }
     shutdown(true)
-}
-
-
-
-/// clear BSS segment
-pub fn clear_bss() {
-    extern "C" {
-        fn sbss();
-        fn ebss();
-    }
-    (sbss as usize..ebss as usize).for_each(|a| unsafe { (a as *mut u8).write_volatile(0) });
 }

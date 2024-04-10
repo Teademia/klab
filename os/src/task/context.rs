@@ -8,7 +8,7 @@ pub struct TaskContext {
     ra: usize,
     /// kernel stack pointer of app
     sp: usize,
-    /// callee saved registers:  s 0..11
+    /// s0-11 register, callee saved
     s: [usize; 12],
 }
 
@@ -23,7 +23,6 @@ impl TaskContext {
     }
     /// set Task Context{__restore ASM funciton: trap_return, sp: kstack_ptr, s: s_0..12}
     pub fn goto_trap_return(kstack_ptr: usize) -> Self {
-        //info!("Finding Kernel_stack_ptr at {:x}", kstack_ptr);
         Self {
             ra: trap_return as usize,
             sp: kstack_ptr,

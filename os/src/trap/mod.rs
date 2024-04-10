@@ -1,10 +1,23 @@
+//! Trap handling functionality
+//!
+//! For rCore, we have a single trap entry point, namely `__alltraps`. At
+//! initialization in [`init()`], we set the `stvec` CSR to point to it.
+//!
+//! All traps go through `__alltraps`, which is defined in `trap.S`. The
+//! assembly language code does just enough work restore the kernel space
+//! context, ensuring that Rust code safely runs, and transfers control to
+//! [`trap_handler()`].
+//!
+//! It then calls different functionality based on what exactly the exception
+//! was. For example, timer interrupts trigger task preemption, and syscalls go
+//! to [`syscall()`].
 mod context;
-pub use context::TrapContext;
 
 use crate::config::{TRAMPOLINE, TRAP_CONTEXT};
-use crate::sbi;
 use crate::syscall::syscall;
-use crate::task::{current_trap_cx, current_user_token, suspend_current_and_run_next};
+use crate::task::{
+    current_trap_cx, current_user_token, exit_current_and_run_next, suspend_current_and_run_next,
+};
 use crate::timer::set_next_trigger;
 use core::arch::{asm, global_asm};
 use riscv::register::{
@@ -14,54 +27,68 @@ use riscv::register::{
 };
 
 global_asm!(include_str!("trap.S"));
+/// initialize CSR `stvec` as the entry of `__alltraps`
+pub fn init() {
+    set_kernel_trap_entry();
+}
 
-#[no_mangle]
-pub fn trap_return() -> ! {
-    //执行第一个任务时
-    //现在是内核地址空间
-    //下面这个函数是设置stvec的值，设置为TrapoLine跳板的值
-    //之后restore
-    //restore的过程中做了几件事
-    //1:切换地址空间到用户空间
-    //2.设置sepc的值返回到程序开始的地方
-
-    //当函数触发trap的时候，会跳转到stvec寄存器指定的值，就是TrapoLine
-    //alltraps会保存用户态的信息，跳转到trap_handler
-    //trap_handler进行的第一件事情就是将stvec设置为内核所对应的trap_handler,这里我们是用一个panic代替
-    //trap_handler最后会调用trap_returu,所以要把trap_handler设置为用户状态的trap_handler(从alltraps)进入
-    set_user_trap_entry();
-    let trap_cx_ptr = TRAP_CONTEXT; //用户地址空间保存TrapContext的虚拟地址
-    let user_satp: usize = current_user_token(); //用户地址空间的satp寄存器地值
-    extern "C" {
-        fn __alltraps();
-        fn __restore();
-    }
-    let restore_va = __restore as usize - __alltraps as usize + TRAMPOLINE;
+fn set_kernel_trap_entry() {
     unsafe {
-        asm!(
-            "fence.i",
-            "jr {restore_va}",             // jump to new addr of __restore asm function
-            restore_va = in(reg) restore_va,
-            in("a0") trap_cx_ptr,      // a0 = virt addr of Trap Context
-            in("a1") user_satp,        // a1 = phy addr of usr page table
-            options(noreturn)
-        );
+        stvec::write(trap_from_kernel as usize, TrapMode::Direct);
     }
 }
+
+fn set_user_trap_entry() {
+    unsafe {
+        stvec::write(TRAMPOLINE as usize, TrapMode::Direct);
+    }
+}
+/// enable timer interrupt in sie CSR
+pub fn enable_timer_interrupt() {
+    unsafe {
+        sie::set_stimer();
+    }
+}
+
 #[no_mangle]
-pub fn trap_handler() {
+/// handle an interrupt, exception, or system call from user space
+pub fn trap_handler() -> ! {
     set_kernel_trap_entry();
-    let cx = current_trap_cx();
     let scause = scause::read();
     let stval = stval::read();
     match scause.cause() {
         Trap::Exception(Exception::UserEnvCall) => {
+            // jump to next instruction anyway
+            let mut cx = current_trap_cx();
             cx.sepc += 4;
-            cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
+            // get system call return value
+            let result = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]);
+            // cx is changed during sys_exec, so we have to call it again
+            cx = current_trap_cx();
+            cx.x[10] = result as usize;
+        }
+        Trap::Exception(Exception::StoreFault)
+        | Trap::Exception(Exception::StorePageFault)
+        | Trap::Exception(Exception::InstructionFault)
+        | Trap::Exception(Exception::InstructionPageFault)
+        | Trap::Exception(Exception::LoadFault)
+        | Trap::Exception(Exception::LoadPageFault) => {
+            println!(
+                "[kernel] {:?} in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it.",
+                scause.cause(),
+                stval,
+                current_trap_cx().sepc,
+            );
+            // page fault exit code
+            exit_current_and_run_next(-2);
+        }
+        Trap::Exception(Exception::IllegalInstruction) => {
+            println!("[kernel] IllegalInstruction in application, kernel killed it.");
+            // illegal instruction exit code
+            exit_current_and_run_next(-3);
         }
         Trap::Interrupt(Interrupt::SupervisorTimer) => {
             set_next_trigger();
-            info!("Get time intterupt");
             suspend_current_and_run_next();
         }
         _ => {
@@ -76,27 +103,35 @@ pub fn trap_handler() {
 }
 
 #[no_mangle]
+/// set the new addr of __restore asm function in TRAMPOLINE page,
+/// set the reg a0 = trap_cx_ptr, reg a1 = phy addr of usr page table,
+/// finally, jump to new addr of __restore asm function
+pub fn trap_return() -> ! {
+    set_user_trap_entry();
+    let trap_cx_ptr = TRAP_CONTEXT;
+    let user_satp = current_user_token();
+    extern "C" {
+        fn __alltraps();
+        fn __restore();
+    }
+    let restore_va = __restore as usize - __alltraps as usize + TRAMPOLINE;
+    unsafe {
+        asm!(
+            "fence.i",
+            "jr {restore_va}",
+            restore_va = in(reg) restore_va,
+            in("a0") trap_cx_ptr,
+            in("a1") user_satp,
+            options(noreturn)
+        );
+    }
+}
+
+#[no_mangle]
+/// Unimplement: traps/interrupts/exceptions from kernel mode
+/// Todo: Chapter 9: I/O device
 pub fn trap_from_kernel() -> ! {
-    panic!("a trap from kernel!");
+    panic!("a trap {:?} from kernel!", scause::read().cause());
 }
 
-pub fn init() {
-    set_kernel_trap_entry(); //Set Kernel Trap Entry to panic
-}
-
-fn set_user_trap_entry() {
-    unsafe {
-        stvec::write(TRAMPOLINE as usize, TrapMode::Direct);
-    }
-}
-fn set_kernel_trap_entry() {
-    unsafe {
-        stvec::write(trap_from_kernel as usize, TrapMode::Direct);
-    }
-}
-
-pub fn enable_timer_interrupt() {
-    unsafe {
-        sie::set_stimer();
-    }
-}
+pub use context::TrapContext;

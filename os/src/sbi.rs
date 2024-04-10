@@ -1,6 +1,5 @@
+//! SBI call wrappers
 #![allow(unused)]
-use crate::config::*;
-use crate::timer::*;
 
 /// use sbi call to putchar in console (qemu uart handler)
 pub fn console_putchar(c: usize) {
@@ -14,6 +13,11 @@ pub fn console_getchar() -> usize {
     sbi_rt::legacy::console_getchar()
 }
 
+/// use sbi call to set timer
+pub fn set_timer(timer: usize) {
+    sbi_rt::set_timer(timer as _);
+}
+
 /// use sbi call to shutdown the kernel
 pub fn shutdown(failure: bool) -> ! {
     use sbi_rt::{system_reset, NoReason, Shutdown, SystemFailure};
@@ -23,9 +27,4 @@ pub fn shutdown(failure: bool) -> ! {
         system_reset(Shutdown, SystemFailure);
     }
     unreachable!()
-}
-
-//这个函数是用来设置mtimecmp寄存器的值
-pub fn set_timer(timer: usize) {
-    sbi_rt::set_timer(timer as _);
 }
