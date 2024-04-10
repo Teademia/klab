@@ -11,6 +11,7 @@ fn main() -> i32 {
     if fork() == 0 {
         exec("user_shell\0");
     } else {
+        //这是Init_Proc的进程
         loop {
             let mut exit_code: i32 = 0;
             let pid = wait(&mut exit_code);
