@@ -36,6 +36,7 @@ mod board;
 #[macro_use]
 mod console;
 mod config;
+mod drivers;
 mod lang_items;
 mod loader;
 mod logging;
@@ -70,14 +71,6 @@ pub fn rust_main() -> ! {
     println!("[kernel] Hello, world!");
     logging::init();
     mm::init();
-    mm::remap_test();
-    task::add_initproc();
-    println!("after initproc!");
-    trap::init();
-    //trap::enable_interrupt();
-    trap::enable_timer_interrupt();
-    timer::set_next_trigger();
-    loader::list_apps();
-    task::run_tasks();
-    panic!("Unreachable in rust_main!");
+    drivers::block::block_device_test();
+    sbi::shutdown(false);
 }
